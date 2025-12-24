@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"rsvp/backend/internal/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -17,6 +18,12 @@ func ConnectDB() {
 	if err != nil {
 		log.Fatal("failed to connect database")
 	}
+
+	db.AutoMigrate(
+		&models.Event{},
+		&models.Guest{},
+		&models.RSVP{},
+	)
 
 	DB = db
 }
