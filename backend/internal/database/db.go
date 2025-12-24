@@ -1,8 +1,8 @@
-package config
+package database
 
 import (
 	"log"
-	"os"
+	"rsvp/backend/internal/config"
 	"rsvp/backend/internal/models"
 
 	"gorm.io/driver/postgres"
@@ -12,18 +12,21 @@ import (
 var DB *gorm.DB
 
 func ConnectDB() {
-	dsn := os.Getenv("DATABASE_URL")
+	cfg := config.LoadConfig()
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
 	if err != nil {
 		log.Fatal("failed to connect database")
 	}
 
-	db.AutoMigrate(
+	err = db.AutoMigrate(
 		&models.Event{},
 		&models.Guest{},
 		&models.RSVP{},
 	)
+	if err != nil {
+		log.Fatal("failed to auto migrate database")
+	}
 
 	DB = db
 }
